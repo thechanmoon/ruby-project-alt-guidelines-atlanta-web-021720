@@ -14,5 +14,5 @@ tty prompt - https://github.com/piotrmurach/tty-prompt
 
 # Github
 
-https://github.com/thechanmoon/video_vending_machine.git
+https://github.com/thechanmoon/ruby-project-alt-guidelines-atlanta-web-021720.git
 
