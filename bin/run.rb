@@ -1,3 +1,7 @@
 require_relative '../config/environment'
 
-puts "hello world"
+def sound(file_path)
+    pid = fork{ exec 'mpg123','-q', file_path }
+end
+
+tty_home
