@@ -68,9 +68,6 @@ def tty_home
     #--------------------------------main menu function---------------------------------------------#
     def tty_main_menu 
         system 'clear'
-        # print "
-        
-        # ".colorize(:green)
         $customer.reload
         TTY::Prompt.new.select("Would you like to...", active_color: :blue) do |menu|
             menu.choice "1. Try our videos?" => -> do tty_list_moives end
@@ -114,7 +111,7 @@ def tty_home
             tty_rent_list(movie_list,"Titles are rented!!")            
         else
             puts "No movie seleted!!"
-            tty_to_main_menu
+            tty_to_main_menu(&method(:tty_list_moives))
         end
 
         # tty_to_main_menu
@@ -127,7 +124,7 @@ def tty_home
         else
             puts "No movie found!!"
         end
-        tty_to_main_menu
+        tty_to_main_menu(&method(:tty_find_movie))
     end
     # Main Menu 3
     def tty_all_rent_list
@@ -147,13 +144,12 @@ def tty_home
         end
 
         if rent_list.length > 0
-            # puts "All videos are returned."
             tty_return_list(rent_list,"All videos are returned.")
         else
             puts "No movie rented!!"
         end
 
-        tty_to_main_menu               
+        tty_to_main_menu(&method(:tty_all_rent_list))               
     end
 
     # Main Menu 4
@@ -172,10 +168,6 @@ def tty_home
         prompt = TTY::Prompt.new
 
         answer = prompt.yes?('Do you reallay want to delete?')
-        # puts answer
-        # if answer == false and func != nil 
-        #     func
-        # end
         if answer
             if user
                 user.destroy
@@ -189,11 +181,6 @@ def tty_home
 
     # Main Menu 6
     def tty_exit
-        # stop_sound
-        #system("pkill mpg123")
-        # start closing time.
-        #sound("audio/semisonic-closing_time.mp3")
-        #ASCII image
         print " 
 
         ####### #          #    ####### ### ######  ####### #     #     #####   #####  #     # ####### ####### #       
@@ -212,9 +199,6 @@ def tty_home
         #   #  #         #     #     #        #   #  
          ###   ####### #####   #     #######   ###   
         ".colorize(:red)
-        #  5 second rest before exiting app
-        # sleep 40
-        #system("pkill mpg123")
         exit
     end
 
@@ -233,7 +217,7 @@ def tty_home
             # puts("Titles are rented!!\n")
             puts("#{message}")    
         end       
-        tty_to_main_menu
+        tty_to_main_menu(&method(:tty_list_moives))
     end
 
     # Helper Function - List return movie
@@ -251,7 +235,7 @@ def tty_home
             # puts("Titles are rented!!\n")
             puts("#{message}")    
         end       
-        tty_to_main_menu
+        tty_to_main_menu(&method(:tty_all_rent_list))
     end
 
     #----------------------------------------Helper Function--------------------------------------# 
@@ -283,14 +267,18 @@ def tty_home
         item_label            
     end
     #Ask to move back to main menu or exit
-    def tty_to_main_menu(func = nil) 
+    def tty_to_main_menu(&func) 
         prompt = TTY::Prompt.new
 
         answer = prompt.yes?('Do you want to move to main menu?')
-        
+
         if answer
             tty_main_menu
         else
-            exit
-    end
+            if func    
+                func.call
+            else
+                exit
+            end
+        end
 end
