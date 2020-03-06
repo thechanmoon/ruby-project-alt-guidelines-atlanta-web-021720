@@ -292,7 +292,7 @@ def tty_to_create_user_menu(message, &stay_func)
     if answer
         stay_func.call
     else
-        if func    
+        if stay_func    
             tty_create_user
         else
             exit
