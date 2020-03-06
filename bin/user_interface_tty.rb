@@ -25,6 +25,17 @@ def tty_home
         
 end
 
+def tty_login 
+    $login_id = TTY::Prompt.new.ask("Oh welcome back, what was your id?")
+    if User.find_by(login_id: $login_id) == nil 
+        puts "Sorry, couldn't find you on our list."
+        # tty_create_user
+        tty_to_create_user_menu("try more?",&method(:tty_login))
+    else  
+        tty_password    
+    end
+end
+
 def tty_create_user 
     $login_id = TTY::Prompt.new.ask("What's your new id?")
     # $password = TTY::Prompt.new.ask("What's your password buddy?")
@@ -45,25 +56,17 @@ def tty_create_user
     end
 end
 
-def tty_login 
-    $login_id = TTY::Prompt.new.ask("Oh welcome back, what was your id?")
-    if User.find_by(login_id: $login_id) == nil 
-        puts "Sorry, couldn't find you on our list. We'll have to add you. "
-        tty_create_user
+def tty_password
+    prompt = TTY::Prompt.new
+    heart = prompt.decorate(prompt.symbols[:heart] + ' ', :magenta)
+    $password  = prompt.mask("What's your password?", mask: heart)
+    $customer = User.find_by(login_id: $login_id, password:$password ) 
+    if $customer == nil 
+        puts "Sorry, password is wrong."
+        tty_password    
     else
-        prompt = TTY::Prompt.new
-        heart = prompt.decorate(prompt.symbols[:heart] + ' ', :magenta)
-        $password  = prompt.mask("What's your password?", mask: heart)
-        $customer = User.find_by(login_id: $login_id, password:$password ) 
-        if $customer == nil 
-            puts "Sorry, password is wrong."
-            tty_login    
-        else
-            tty_main_menu
-        end
-        
-        
-    end
+        tty_main_menu
+    end 
 end
 #--------------------------------main menu function---------------------------------------------#
 def tty_main_menu 
@@ -248,9 +251,9 @@ def tty_make_menu_item(movie_name,actor_names, genre_names)
     actor_names.flatten.each do |name| 
         item_label = item_label + " " + name
         if(actor_names.last != name)
-        item_label = item_label + " and"
+            item_label = item_label + " and"
         else
-        item_label = item_label + ","     
+            item_label = item_label + ","     
         end
     end
 
@@ -258,9 +261,9 @@ def tty_make_menu_item(movie_name,actor_names, genre_names)
     genre_names.flatten.each do |name| 
         item_label = item_label + " " + name
         if(genre_names.last != name)
-        item_label = item_label + " and"
+            item_label = item_label + " and"
         else
-        item_label = item_label + " )"     
+            item_label = item_label + " )"     
         end
     end
 
@@ -277,6 +280,20 @@ def tty_to_main_menu(&func)
     else
         if func    
             func.call
+        else
+            exit
+        end
+    end
+end
+#Ask to try login more or move to create_user menu
+def tty_to_create_user_menu(message, &stay_func) 
+    prompt = TTY::Prompt.new
+    answer = prompt.yes?(message)
+    if answer
+        stay_func.call
+    else
+        if func    
+            tty_create_user
         else
             exit
         end
